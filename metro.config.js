@@ -1,3 +1,11 @@
+// // metro.config.js
+// const { wrapWithReanimatedMetroConfig } = require('react-native-reanimated/metro-config');
+
+// const config = {
+//   // Optional: Bạn có thể thêm các cấu hình tùy chỉnh ở đây
+// };
+
+// module.exports = wrapWithReanimatedMetroConfig(config);
 const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
 
 /**
