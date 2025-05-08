@@ -3,7 +3,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import HomeScreen from './src/screens/HomeScreen';
+import HomeScreen from './src/screens/home/HomeScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import RegisterScreen from './src/screens/auth/RegisterScreen';
 import 'react-native-gesture-handler';
@@ -59,8 +59,38 @@ const App: React.FC = () => {
             {
               text: 'Từ chối',
               style: 'cancel',
-              onPress: () => {
-                console.log('Admin từ chối yêu cầu.');
+              onPress: async () => {
+
+                try {
+                  const snapshot = await database()
+                    .ref('accounts')
+                    .once('value');
+                  const accounts = snapshot.val();
+                  if (!accounts) return;
+                  // Lọc các tài khoản có role là "user"
+                  const userTokens = Object.values(accounts)
+                    .filter((acc: any) => acc.role === 'user' && acc.fcmToken)
+                    .map((acc: any) => acc.fcmToken);
+
+                  // Gửi thông báo đến từng user
+                  for (const token of userTokens) {
+                    await fetch('http://10.0.2.2:3000/send-notification', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        // Thay bằng server key của bạn
+                      },
+                      body: JSON.stringify({
+                        token,
+
+                        title: 'Yêu cầu bị từ chối',
+                        body: 'Yêu cầu mượn thiết bị của bạn đã bị từ chối.',
+                      }),
+                    });
+                  }
+                } catch (error) {
+                  console.error('Lỗi khi gửi thông báo đến user:', error);
+                }
               },
             },
           ],

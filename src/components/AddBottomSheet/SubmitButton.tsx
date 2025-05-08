@@ -1,6 +1,6 @@
 import React from 'react';
 import {TouchableOpacity, Text} from 'react-native';
-import styles from './AddBottomSheet.styles';
+import styles from './add-bottomsheet.styles';
 
 interface Props {
   label: string;

@@ -6,7 +6,7 @@ import {
   BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
 import { db } from '../../config/firebaseConfig';
-import styles from './AddBottomSheet.styles';
+import styles from './add-bottomsheet.styles';
 import {
   InputDevice,
   BrandSelector,
