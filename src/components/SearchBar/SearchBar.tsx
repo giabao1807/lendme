@@ -1,14 +1,24 @@
 import React, {useState} from 'react';
 import {View, TextInput, Image} from 'react-native';
-import styles from './SearchBarStyles';
+import styles from './SearchBar.styles';
+import images from '../../assets';
 
-export default function SearchBar() {
+interface SearchBarProps {
+  onSearch: (text: string) => void;
+}
+
+export default function SearchBar({onSearch}: SearchBarProps) {
   const [searchText, setSearchText] = useState('');
+
+  const handleSearchChange = (text: string) => {
+    setSearchText(text);
+    onSearch(text);
+  };
 
   return (
     <View style={styles.searchBar}>
       <Image
-        source={require('../assets/Search.png')}
+        source={images.searchIcon}
         style={styles.searchIcon}
       />
 
@@ -17,7 +27,7 @@ export default function SearchBar() {
         placeholder="Tìm thiết bị"
         placeholderTextColor="#fff"
         value={searchText}
-        onChangeText={setSearchText}
+        onChangeText={handleSearchChange}
       />
     </View>
   );

@@ -6,8 +6,10 @@ import {
   BottomSheetView,
   BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
-import AddDeviceBottomSheet from './AddBottomSheet/AddDeviceBottomSheet';
-import styles from './DeviceBottomSheetStyles';
+import AddDeviceBottomSheet from '../AddBottomSheet/AddBottomSheet';
+import styles from './DeviceBottomSheet.styles';
+import images from '../../assets';
+
 interface DeviceBottomSheetProps {
   onClose: () => void;
 }
@@ -55,7 +57,7 @@ const DeviceBottomSheet = forwardRef<BottomSheetModal, DeviceBottomSheetProps>(
               style={styles.item}
               onPress={handleOpenAddDeviceBottomSheet}>
               <Image
-                source={require('../assets/Device.png')}
+                source={images.deviceIcon}
                 style={styles.icon}
               />
               <Text style={styles.text}>Thêm thiết bị mới</Text>

@@ -1,7 +1,8 @@
 import React from 'react';
-import { Text, TouchableOpacity, View} from 'react-native';
-import styles from './AddDeviceBottomSheetStyles';
-import {BottomSheetFlatList} from '@gorhom/bottom-sheet';
+import { Text, TouchableOpacity, View, FlatList } from 'react-native';
+import styles from './AddBottomSheet.styles';
+import { sort } from '../../utils/sortUtils';
+
 interface Brand {
   id: string;
   name: string;
@@ -13,34 +14,39 @@ interface Props {
   onSelect: (id: string) => void;
 }
 
-const BrandSelector = ({brands, selectedBrand, onSelect}: Props) => (
-  <View style={styles.brandSelectionContainer}>
-    <Text style={styles.text}>Hãng</Text>
-    <BottomSheetFlatList
-      data={brands}
-      keyExtractor={item => item.id}
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      directionalLockEnabled
-       keyboardShouldPersistTaps="handled"
-      renderItem={({item}) => (
-        <TouchableOpacity
-          style={[
-            styles.brandButton,
-            selectedBrand === item.id && styles.selectedBrandButton,
-          ]}
-          onPress={() => onSelect(item.id)}>
-          <Text
+const BrandSelector = ({ brands, selectedBrand, onSelect }: Props) => {
+  const sortedBrands = sort(brands);
+
+  return (
+    <View style={styles.brandSelectionContainer}>
+      <Text style={styles.text}>Hãng</Text>
+      <FlatList
+        data={sortedBrands}
+        keyExtractor={item => item.id}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        directionalLockEnabled
+        keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled
+        renderItem={({ item }) => (
+          <TouchableOpacity
             style={[
-              styles.brandText,
-              selectedBrand === item.id && styles.selectedBrandText,
-            ]}>
-            {item.name}
-          </Text>
-        </TouchableOpacity>
-      )}
-    />
-  </View>
-);
+              styles.brandButton,
+              selectedBrand === item.id && styles.selectedBrandButton,
+            ]}
+            onPress={() => onSelect(item.id)}>
+            <Text
+              style={[
+                styles.brandText,
+                selectedBrand === item.id && styles.selectedBrandText,
+              ]}>
+              {item.name}
+            </Text>
+          </TouchableOpacity>
+        )}
+      />
+    </View>
+  );
+};
 
 export default BrandSelector;

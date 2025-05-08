@@ -1,16 +1,20 @@
 import {StyleSheet} from 'react-native';
 
 const styles = StyleSheet.create({
-  adminButton: {
-    width: 40,
-    height: 40,
-    backgroundColor: '#115EA3',
-    borderRadius: 20,
+  addButton: {
+    position: 'absolute',
+    bottom: 38,
+    right: 16,
+    width: 56,
+    height: 56,
+    backgroundColor: 'red',
+    //backgroundColor: '#115EA3',
+    borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 11,
+
   },
-  adminIcon: {
+  addIcon: {
     width: 24,
     height: 24,
   },

@@ -1,15 +1,17 @@
-import React, {forwardRef, useRef} from 'react';
+import React, {forwardRef} from 'react';
 import {Text, View, TouchableOpacity, Image} from 'react-native';
 import {
   BottomSheetModal,
   BottomSheetView,
   BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
-import {Device} from './DeviceList';
-import styles from './EditBottomSheetStyles';
+import {Device} from '../DeviceList/DeviceList';
+import styles from './DetailBottomSheet.styles';
 import database from '@react-native-firebase/database';
+import Toast from 'react-native-toast-message';
+import images from '../../assets';
 
-import UpdateBottomSheet from './UpdateBottomSheet';
+//import UpdateBottomSheet from './UpdateBottomSheet';
 
 const CustomHandle = () => null;
 
@@ -24,17 +26,51 @@ const CustomBackdrop = (props: any) => (
 
 const CustomBackground = () => <View style={styles.sheetBackground} />;
 
-interface EditBottomSheetProps {
+const sendNotificationToUsers = async (device: Device) => {
+  try {
+    const snapshot = await database().ref('accounts').once('value');
+    const accounts = snapshot.val();
+
+    if (!accounts) return;
+
+    // Lọc các tài khoản có role là "user" và có fcmToken
+    const userTokens = Object.values(accounts)
+      .filter((acc: any) => acc.role === 'user' && acc.fcmToken)
+      .map((acc: any) => acc.fcmToken);
+
+    for (const token of userTokens) {
+      await fetch('http://10.0.2.2:3000/send-notification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token,
+          title: 'Yêu cầu trả thiết bị',
+          body: `Vui lòng ${device.borrowerName} trả thiết bị ${device.deviceName}`,
+          data: {
+            deviceId: device.id,
+            deviceName: device.deviceName,
+          },
+        }),
+      });
+    }
+  } catch (err) {
+    console.error('Lỗi khi gửi thông báo đến user:', err);
+  }
+};
+
+interface DetailBottomSheetProps {
   device: Device | null;
   onDelete: () => void;
   onRequestReturn: () => void;
   onClose?: () => void;
   onVisibilityChange?: (isVisible: boolean) => void;
   onEdit: () => void;
-  onUpdateVisibilityChange?: (isVisible: boolean) => void; // NEW
+  onUpdateVisibilityChange?: (isVisible: boolean) => void;
 }
 
-const EditBottomSheet = forwardRef(
+const DetailBottomSheet = forwardRef(
   (
     {
       device,
@@ -42,11 +78,12 @@ const EditBottomSheet = forwardRef(
       onRequestReturn,
       onClose,
       onVisibilityChange,
-      onUpdateVisibilityChange, // NEW
-    }: EditBottomSheetProps,
+      //onUpdateVisibilityChange,
+      onEdit,
+    }: DetailBottomSheetProps,
     ref: any,
   ) => {
-    const updateBottomSheetRef = useRef<BottomSheetModal>(null);
+    //const updateBottomSheetRef = useRef<BottomSheetModal>(null);
 
     if (!device) return null;
 
@@ -74,16 +111,6 @@ const EditBottomSheet = forwardRef(
       } catch (error) {
         console.error('Lỗi khi xóa thiết bị và dữ liệu liên quan:', error);
       }
-    };
-
-    const handleOpenUpdateBottomSheet = () => {
-      onUpdateVisibilityChange?.(true);
-      updateBottomSheetRef.current?.present();
-    };
-
-    const handleUpdateBottomSheetClose = () => {
-      onUpdateVisibilityChange?.(false);
-      updateBottomSheetRef.current?.dismiss();
     };
 
     return (
@@ -114,9 +141,11 @@ const EditBottomSheet = forwardRef(
 
             <TouchableOpacity
               style={styles.editContainer}
-              onPress={handleOpenUpdateBottomSheet}>
+              onPress={() => {
+                onEdit();
+              }}>
               <Image
-                source={require('../assets/edit.png')}
+                source={images.editIcon}
                 style={styles.icon}
               />
               <Text style={styles.optionText}>Sửa thông tin thiết bị</Text>
@@ -126,7 +155,7 @@ const EditBottomSheet = forwardRef(
               style={styles.deleteContainer}
               onPress={handleDeleteDevice}>
               <Image
-                source={require('../assets/delete.png')}
+                source={images.deleteIcon}
                 style={styles.icon}
               />
               <Text style={styles.optionText}>Xóa thiết bị</Text>
@@ -136,24 +165,30 @@ const EditBottomSheet = forwardRef(
 
             <TouchableOpacity
               style={styles.requestContainer}
-              onPress={onRequestReturn}>
+              onPress={async () => {
+                onRequestReturn();
+
+                Toast.show({
+                  type: 'success',
+                  text1: `Gửi yêu cầu trả thiết bị ${device.deviceName} đến ${device.borrowerName} thành công`,
+                  position: 'top',
+                  visibilityTime: 5000,
+                });
+                if (device) {
+                  await sendNotificationToUsers(device);
+                }
+              }}>
               <Image
-                source={require('../assets/send_to_mobile.png')}
+                source={images.returnIcon}
                 style={styles.icon}
               />
               <Text style={styles.optionText}>Gửi yêu cầu trả thiết bị</Text>
             </TouchableOpacity>
           </BottomSheetView>
         </BottomSheetModal>
-
-        <UpdateBottomSheet
-          ref={updateBottomSheetRef}
-          device={device}
-          onClose={handleUpdateBottomSheetClose}
-        />
       </>
     );
   },
 );
 
-export default EditBottomSheet;
+export default DetailBottomSheet;

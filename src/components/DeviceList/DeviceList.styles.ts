@@ -60,6 +60,22 @@ const styles = StyleSheet.create({
     letterSpacing: -0.43,
     color: '#616161',
   },
+  borrowName: {
+    fontFamily: 'Roboto-Medium',
+    fontWeight: '500',
+    fontSize: 14,
+    lineHeight: 22,
+    letterSpacing: -0.43,
+    color: '#616161',
+  },
+  borrowDate: {
+    fontFamily: 'Roboto-Regular',
+    fontWeight: '400',
+    fontSize: 14,
+    lineHeight: 22,
+    letterSpacing: -0.43,
+    color: '#616161',
+  },
 });
 
 export default styles;

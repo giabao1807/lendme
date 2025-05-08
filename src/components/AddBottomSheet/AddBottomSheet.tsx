@@ -1,18 +1,18 @@
-import React, {useState, useEffect, forwardRef} from 'react';
-import {View, Text, Alert} from 'react-native';
+import React, { useState, useEffect, forwardRef } from 'react';
+import { View, Text, Alert} from 'react-native';
 import {
   BottomSheetModal,
   BottomSheetView,
   BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
-import {db} from '../../config/firebaseConfig';
-import styles from './AddDeviceBottomSheetStyles';
+import { db } from '../../config/firebaseConfig';
+import styles from './AddBottomSheet.styles';
 import {
   InputDevice,
   BrandSelector,
   Checkbox,
   SubmitButton,
-} from '../AddBottomSheet';
+} from '.';
 
 interface Brand {
   id: string;
@@ -39,7 +39,7 @@ const CustomBackground = () => <View style={styles.sheetBackground} />;
 const AddDeviceBottomSheet = forwardRef<
   BottomSheetModal,
   AddDeviceBottomSheetProps
->(({onClose}, ref) => {
+>(({ onClose }, ref) => {
   const snapPoints = ['43.5%'];
 
   const [deviceName, setDeviceName] = useState('');
@@ -136,7 +136,9 @@ const AddDeviceBottomSheet = forwardRef<
       enablePanDownToClose={true}
       handleComponent={CustomHandle}
       backdropComponent={CustomBackdrop}
-      backgroundComponent={CustomBackground}>
+      backgroundComponent={CustomBackground}
+      enableContentPanningGesture={false}
+    >
       <BottomSheetView style={styles.contentContainer}>
         <View style={styles.customHandle}>
           <View style={styles.indicator} />

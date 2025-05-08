@@ -1,6 +1,6 @@
 import React from 'react';
 import {Text, TextInput, View} from 'react-native';
-import styles from './AddDeviceBottomSheetStyles';
+import styles from './AddBottomSheet.styles';
 
 interface Props {
   deviceName: string;
