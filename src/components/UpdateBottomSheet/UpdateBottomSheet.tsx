@@ -5,12 +5,13 @@ import {
   BottomSheetView,
   BottomSheetBackdrop,
   BottomSheetFlatList,
+  BottomSheetTextInput,
 } from '@gorhom/bottom-sheet';
 import {db} from '../../config/firebaseConfig';
 import styles from './UpdateBottomSheet.styles';
 import {Device} from '../DeviceList/DeviceList';
-import {TextInput} from 'react-native-gesture-handler';
-import { sort } from '../../utils/sortUtils';
+//import { TextInput } from 'react-native-gesture-handler';
+import {sort} from '../../utils/sortUtils';
 
 const CustomBackdrop = (props: any) => (
   <BottomSheetBackdrop
@@ -22,6 +23,7 @@ const CustomBackdrop = (props: any) => (
 );
 
 const CustomBackground = () => <View style={styles.sheetBackground} />;
+
 interface Brand {
   id: string;
   name: string;
@@ -30,12 +32,12 @@ interface Brand {
 interface UpdateBottomSheetProps {
   device: Device | null;
   onClose: () => void;
+  onVisibilityChange?: (isVisible: boolean) => void;
 }
 
 const UpdateBottomSheet = forwardRef<BottomSheetModal, UpdateBottomSheetProps>(
-  ({device, onClose}, ref) => {
+  ({device, onClose, onVisibilityChange}, ref) => {
     const snapPoints = ['40%'];
-
     const [deviceName, setDeviceName] = useState('');
     const [brands, setBrands] = useState<Brand[]>([]);
     const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
@@ -66,7 +68,6 @@ const UpdateBottomSheet = forwardRef<BottomSheetModal, UpdateBottomSheetProps>(
       return () => brandsRef.off('value', listener);
     }, []);
 
-    // Hàm xử lý cập nhật thiết bị
     const handleUpdate = async () => {
       if (!device) {
         Alert.alert('Lỗi', 'Không tìm thấy thông tin thiết bị.');
@@ -76,7 +77,6 @@ const UpdateBottomSheet = forwardRef<BottomSheetModal, UpdateBottomSheetProps>(
       const trimmedName = deviceName.trim();
       const updates: Partial<Device> = {};
 
-      // Nếu tên mới khác tên cũ -> cập nhật
       if (trimmedName && trimmedName !== device.deviceName) {
         updates.deviceName = trimmedName;
       }
@@ -115,13 +115,25 @@ const UpdateBottomSheet = forwardRef<BottomSheetModal, UpdateBottomSheetProps>(
         snapPoints={snapPoints}
         onDismiss={() => {
           onClose();
+          onVisibilityChange?.(false);
+        }}
+        onChange={index => {
+          if (index === -1) {
+            onVisibilityChange?.(false);
+          } else {
+            onVisibilityChange?.(true);
+          }
         }}
         enableOverDrag={false}
         enablePanDownToClose
         handleComponent={() => null}
         backdropComponent={CustomBackdrop}
         backgroundComponent={CustomBackground}
-        enableContentPanningGesture={false}>
+        enableContentPanningGesture={false}
+        keyboardBehavior="interactive"
+        keyboardBlurBehavior="restore"
+        //android_keyboardInputMode="adjustPan"
+      >
         <BottomSheetView style={styles.contentContainer}>
           <View style={styles.customHandle}>
             <View style={styles.indicator} />
@@ -129,10 +141,9 @@ const UpdateBottomSheet = forwardRef<BottomSheetModal, UpdateBottomSheetProps>(
 
           <Text style={styles.title}>Sửa thông tin thiết bị</Text>
 
-          {/* Nhập tên thiết bị */}
           <View style={styles.inputContainer}>
             <Text style={styles.text}>Tên thiết bị</Text>
-            <TextInput
+            <BottomSheetTextInput
               style={styles.input}
               placeholder="Nhập tên thiết bị mới"
               placeholderTextColor="#87B6DE"
@@ -141,7 +152,6 @@ const UpdateBottomSheet = forwardRef<BottomSheetModal, UpdateBottomSheetProps>(
             />
           </View>
 
-          {/* Chọn hãng */}
           <View style={styles.brandSelectionContainer}>
             <Text style={styles.text}>Hãng</Text>
             <BottomSheetFlatList
@@ -168,7 +178,6 @@ const UpdateBottomSheet = forwardRef<BottomSheetModal, UpdateBottomSheetProps>(
             />
           </View>
 
-          {/* Nút cập nhật */}
           <TouchableOpacity style={styles.updateButton} onPress={handleUpdate}>
             <Text style={styles.updateButtonText}>Cập Nhật</Text>
           </TouchableOpacity>

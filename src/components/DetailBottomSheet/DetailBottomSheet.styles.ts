@@ -12,6 +12,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     overflow: 'hidden',
     paddingTop: 0,
+    //paddingBottom: 36,
   },
   customHandle: {
     alignItems: 'center',

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Text, TouchableOpacity, View, FlatList } from 'react-native';
-import styles from './add-bottomsheet.styles';
-import { sort } from '../../utils/sortUtils';
+import {Text, TouchableOpacity, View, FlatList} from 'react-native';
+import styles from './AddBottomSheet.styles';
+import {sort} from '../../utils/sortUtils';
 
 interface Brand {
   id: string;
@@ -14,7 +14,7 @@ interface Props {
   onSelect: (id: string) => void;
 }
 
-const BrandSelector = ({ brands, selectedBrand, onSelect }: Props) => {
+const BrandSelector = ({brands, selectedBrand, onSelect}: Props) => {
   const sortedBrands = sort(brands);
 
   return (
@@ -28,7 +28,7 @@ const BrandSelector = ({ brands, selectedBrand, onSelect }: Props) => {
         directionalLockEnabled
         keyboardShouldPersistTaps="handled"
         nestedScrollEnabled
-        renderItem={({ item }) => (
+        renderItem={({item}) => (
           <TouchableOpacity
             style={[
               styles.brandButton,

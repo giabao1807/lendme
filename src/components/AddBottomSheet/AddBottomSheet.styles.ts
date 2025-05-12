@@ -5,18 +5,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#115EA3',
     flex: 1,
   },
-  container: {
+  contentContainer: {
     flex: 1,
     backgroundColor: '#115EA3',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     overflow: 'hidden',
     paddingTop: 0,
+    paddingBottom: 36,
   },
   customHandle: {
     alignItems: 'center',
     paddingTop: 8,
-    // backgroundColor: 'red',
+    //backgroundColor: 'red',
   },
   indicator: {
     width: 36,
@@ -25,8 +26,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#D1D1D1',
   },
   title: {
-    marginTop: 17,
-    paddingLeft: 16,
     fontFamily: 'Roboto-Medium',
     paddingVertical: 1,
     fontSize: 16,
@@ -34,11 +33,12 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     lineHeight: 22,
     letterSpacing: -0.43,
+    paddingLeft: 16,
+    marginTop: 12,
   },
   inputContainer: {
     marginHorizontal: 16,
     marginTop: 12,
-    marginBottom: 17,
   },
   text: {
     fontFamily: 'Roboto-Regular',
@@ -48,8 +48,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.43,
     lineHeight: 22,
   },
-
-  inputText: {
+  input: {
     marginTop: 10,
     borderRadius: 10,
     paddingLeft: 12,
@@ -62,12 +61,44 @@ const styles = StyleSheet.create({
     letterSpacing: -0.43,
     paddingVertical: 7,
   },
+  brandSelectionContainer: {
+    marginHorizontal: 18,
+    marginTop: 16,
+  },
+  // brandsContainer: {
+  //   flexDirection: 'row',
+  //   marginTop: 40,
+  //   marginBottom: 11,
+  // },
+  brandButton: {
+    marginTop: 12,
+    marginBottom: 11,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 100,
+    borderWidth: 1,
+    borderColor: '#FFFFFF',
+    marginRight: 12,
+  },
+  brandText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  selectedBrandButton: {
+    backgroundColor: '#FFFFFF',
+  },
 
+  selectedBrandText: {
+    //backgroundColor: 'red',
+    color: '#115EA3',
+  },
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginLeft: 16,
-    marginBottom: 24,
+    marginTop: 40,
+    //borderRadius: 100,
+    //backgroundColor: 'red',
   },
   checkbox: {
     width: 24,
@@ -75,29 +106,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 100,
+    marginRight: 12,
+    //backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#FFFFFF',
-    marginRight: 12,
   },
   checkboxChecked: {
     backgroundColor: '#FFFFFF',
   },
   checkboxTick: {
     color: '#115EA3',
-    fontWeight: 'bold',
-    fontSize: 16,
   },
-
-  button: {
+  submitButton: {
     backgroundColor: '#115EA3',
     paddingVertical: 13,
     alignItems: 'center',
     borderRadius: 10,
+    marginTop: 24,
     marginHorizontal: 16,
     borderWidth: 1,
     borderColor: '#FFFFFF',
   },
-  buttonText: {
+  submitButtonText: {
     fontFamily: 'Roboto-Bold',
     color: '#FFFFFF',
     fontWeight: '700',

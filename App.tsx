@@ -33,6 +33,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       const {deviceId, userName} = remoteMessage.data || {};
+      
 
       if (userName) {
         Alert.alert(
@@ -60,25 +61,22 @@ const App: React.FC = () => {
               text: 'Từ chối',
               style: 'cancel',
               onPress: async () => {
-
                 try {
                   const snapshot = await database()
                     .ref('accounts')
                     .once('value');
                   const accounts = snapshot.val();
                   if (!accounts) return;
-                  // Lọc các tài khoản có role là "user"
+
                   const userTokens = Object.values(accounts)
                     .filter((acc: any) => acc.role === 'user' && acc.fcmToken)
                     .map((acc: any) => acc.fcmToken);
 
-                  // Gửi thông báo đến từng user
                   for (const token of userTokens) {
                     await fetch('http://10.0.2.2:3000/send-notification', {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
-                        // Thay bằng server key của bạn
                       },
                       body: JSON.stringify({
                         token,

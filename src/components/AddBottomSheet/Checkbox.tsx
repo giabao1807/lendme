@@ -1,6 +1,6 @@
 import React from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
-import styles from './add-bottomsheet.styles';
+import styles from './AddBottomSheet.styles';
 
 interface Props {
   isChecked: boolean;

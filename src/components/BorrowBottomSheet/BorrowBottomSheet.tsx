@@ -1,9 +1,10 @@
 import React, {forwardRef, useEffect, useState} from 'react';
-import {Text, View, TextInput, TouchableOpacity} from 'react-native';
+import {Text, View, TouchableOpacity} from 'react-native';
 import {
   BottomSheetModal,
   BottomSheetView,
   BottomSheetBackdrop,
+  BottomSheetTextInput,
 } from '@gorhom/bottom-sheet';
 import styles from './BorrowBottomSheet.styles';
 import database from '@react-native-firebase/database';
@@ -35,7 +36,7 @@ const BorrowBottomSheet = forwardRef(
   ({device, onBorrowSuccess, onClose}: BorrowBottomSheetProps, ref: any) => {
     const [rememberName, setRememberName] = useState(true);
     const [userName, setUserName] = useState('');
-    const snapPoints = ['31%'];
+    //const snapPoints = ['31%'];
 
     useEffect(() => {
       const loadSavedName = async () => {
@@ -47,7 +48,6 @@ const BorrowBottomSheet = forwardRef(
         }
         setRememberName(false);
       };
-
       loadSavedName();
     }, [device]);
 
@@ -58,7 +58,6 @@ const BorrowBottomSheet = forwardRef(
       try {
         const snapshot = await database().ref('accounts').once('value');
         const accounts = snapshot.val();
-
         if (!accounts) return;
 
         const adminTokens = Object.values(accounts)
@@ -66,27 +65,27 @@ const BorrowBottomSheet = forwardRef(
           .map((acc: any) => acc.fcmToken);
 
         for (const token of adminTokens) {
-          await fetch('http://10.0.2.2:3000/send-notification', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              token,
-              title: 'Yêu cầu mượn thiết bị',
-              body: `${userName} đã gửi yêu cầu mượn thiết bị ${device.deviceName}`,
-              data: {
-                deviceId: device.id,
-                userName,
-              },
-            }),
-          });
+          console.log('Sending notification to token:', token);
+          try {
+            await fetch('http://192.168.223.39:3000/send-notification', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                token,
+                title: 'Yêu cầu mượn thiết bị',
+                body: `${userName} đã gửi yêu cầu mượn thiết bị ${device.deviceName}`,
+                data: {deviceId: device.id, userName},
+              }),
+            });
+          } catch (err) {
+            console.error('Lỗi khi gửi thông báo đến admin:', err);
+          }
         }
       } catch (err) {
         console.error('Lỗi khi gửi thông báo đến admin:', err);
       }
     };
-
+    //taoj request muon thiet bi, userId,deviceId trang thai pending, admin doc request trang thai pending se hien len va acept vaf update lai trang thai moi
     const handleSubmit = async () => {
       if (!device || userName.trim() === '') return;
 
@@ -104,9 +103,9 @@ const BorrowBottomSheet = forwardRef(
             createDate: `${createDate.datePart} ${createDate.time}`,
           });
 
-        await database().ref(`devices/${device.id}`).update({
-          status: 'pending',
-        });
+        await database()
+          .ref(`devices/${device.id}`)
+          .update({status: 'pending'});
 
         if (rememberName) {
           await AsyncStorage.setItem('borrowerName', userName);
@@ -134,17 +133,19 @@ const BorrowBottomSheet = forwardRef(
       <BottomSheetModal
         ref={ref}
         index={0}
-        snapPoints={snapPoints}
+        //snapPoints={snapPoints}
         enableOverDrag={false}
         enablePanDownToClose
         handleComponent={CustomHandle}
         onChange={index => {
-          if (index === -1) {
-            onClose?.();
-          }
+          if (index === -1) onClose?.();
         }}
         backdropComponent={CustomBackdrop}
-        backgroundComponent={CustomBackground}>
+        backgroundComponent={CustomBackground}
+        keyboardBehavior="interactive"
+        keyboardBlurBehavior="restore"
+        //android_keyboardInputMode="adjustPan"
+        >
         <BottomSheetView style={styles.container}>
           <View style={styles.customHandle}>
             <View style={styles.indicator} />
@@ -154,7 +155,7 @@ const BorrowBottomSheet = forwardRef(
 
           <View style={styles.inputContainer}>
             <Text style={styles.text}>Tên người mượn</Text>
-            <TextInput
+            <BottomSheetTextInput
               style={styles.inputText}
               placeholder="Nhập họ và tên"
               placeholderTextColor="#87B6DE"
@@ -165,9 +166,7 @@ const BorrowBottomSheet = forwardRef(
 
           <TouchableOpacity
             style={styles.checkboxContainer}
-            onPress={() => {
-              setRememberName(!rememberName);
-            }}>
+            onPress={() => setRememberName(!rememberName)}>
             <View
               style={[styles.checkbox, rememberName && styles.checkboxChecked]}>
               {rememberName && <Text style={styles.checkboxTick}>✓</Text>}

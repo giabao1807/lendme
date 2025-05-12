@@ -1,12 +1,11 @@
-import React, {useState, useMemo, useEffect, useRef} from 'react';
-import {SectionList, Text, View, Image, TouchableOpacity} from 'react-native';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { SectionList, Text, View, Image, TouchableOpacity } from 'react-native';
 import styles from './DeviceList.styles';
-import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import database from '@react-native-firebase/database';
 import DetailBottomSheet from '../DetailBottomSheet';
 import UpdateBottomSheet from '../UpdateBottomSheet/UpdateBottomSheet';
 import images from '../../assets/index';
-
 
 export interface Device {
   id: string;
@@ -35,11 +34,9 @@ export default function DeviceList({
   availableDevices,
   borrowedDevices,
   onEditSheetVisibilityChange,
-  userRole, // Nhận userRole từ props
+  userRole,
 }: DeviceListProps) {
-  const [collapsedSections, setCollapsedSections] = useState<
-    Record<SectionTitle, boolean>
-  >({
+  const [collapsedSections, setCollapsedSections] = useState<Record<SectionTitle, boolean>>({
     'Danh sách thiết bị': false,
     'Danh sách thiết bị có thể mượn': false,
   });
@@ -51,8 +48,7 @@ export default function DeviceList({
   const detailBottomSheetRef = useRef<BottomSheetModal>(null);
   const updateBottomSheetRef = useRef<BottomSheetModal>(null);
 
-  const capitalize = (text: string) =>
-    text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+  const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 
   const getBrandIcon = (brand: string) =>
     brand.toLowerCase() === 'apple' ? images.iosIcon : images.androidIcon;
@@ -95,7 +91,7 @@ export default function DeviceList({
 
             if (userInfo.createDate) {
               const [datePart, time] = userInfo.createDate.split(' ');
-              device.borrowDate = {time, datePart};
+              device.borrowDate = { time, datePart };
             }
           }
         }
@@ -109,7 +105,6 @@ export default function DeviceList({
 
   useEffect(() => {
     if (selectedDevice && isDetailBottomSheetOpen) {
-      console.log('Thiết bị được chọn:', selectedDevice);
       detailBottomSheetRef.current?.present();
       onEditSheetVisibilityChange(true);
     }
@@ -124,27 +119,23 @@ export default function DeviceList({
     return [
       {
         title: 'Danh sách thiết bị' as SectionTitle,
-        data: collapsedSections['Danh sách thiết bị']
-          ? []
-          : devicesWithUserData,
+        data: collapsedSections['Danh sách thiết bị'] ? [] : devicesWithUserData,
       },
       {
         title: 'Danh sách thiết bị có thể mượn' as SectionTitle,
-        data: collapsedSections['Danh sách thiết bị có thể mượn']
-          ? []
-          : availableDevices,
+        data: collapsedSections['Danh sách thiết bị có thể mượn'] ? [] : availableDevices,
       },
     ];
   }, [availableDevices, devicesWithUserData, collapsedSections]);
 
   const handleDeleteDevice = async () => {
-    if (!selectedDevice) return
+    if (!selectedDevice) return;
 
     try {
       await database().ref(`/devices/${selectedDevice.id}`).remove();
 
       setDevicesWithUserData(prev =>
-        prev.filter(device => device.id !== selectedDevice.id),
+        prev.filter(device => device.id !== selectedDevice.id)
       );
 
       detailBottomSheetRef.current?.close();
@@ -165,8 +156,6 @@ export default function DeviceList({
       section === 'Danh sách thiết bị có thể mượn'
     ) {
       onDevicePress(device);
-    } else {
-      return;
     }
   };
 
@@ -176,7 +165,7 @@ export default function DeviceList({
         showsVerticalScrollIndicator={false}
         sections={sections}
         keyExtractor={(item, index) => item.id + index}
-        renderSectionHeader={({section: {title}}) => {
+        renderSectionHeader={({ section: { title } }) => {
           const isCollapsed = collapsedSections[title];
           const arrowIcon = isCollapsed ? images.arrowRight : images.arrowIcon;
 
@@ -192,13 +181,12 @@ export default function DeviceList({
             </TouchableOpacity>
           );
         }}
-        renderItem={({item, section}) => {
+        renderItem={({ item, section }) => {
           const brand = capitalize(item.brand);
           const icon = getBrandIcon(item.brand);
 
           return (
-            <TouchableOpacity
-              onPress={() => handleDevicePress(item, section.title)}>
+            <TouchableOpacity onPress={() => handleDevicePress(item, section.title)}>
               <View style={styles.itemContainer}>
                 <Image source={icon} style={styles.deviceIcon} />
                 <View style={styles.textContainer}>
@@ -224,22 +212,22 @@ export default function DeviceList({
           );
         }}
       />
+
       <DetailBottomSheet
         ref={detailBottomSheetRef}
         device={selectedDevice}
         onEdit={handleEditDevice}
         onDelete={handleDeleteDevice}
         onRequestReturn={() => {
-          console.log('Gửi yêu cầu trả thiết bị:', selectedDevice);
           detailBottomSheetRef.current?.close();
         }}
         onClose={() => {
-          console.log('Đóng DetailBottomSheet');
           onEditSheetVisibilityChange(false);
           setIsDetailBottomSheetOpen(false);
         }}
         onVisibilityChange={onEditSheetVisibilityChange}
       />
+
       <UpdateBottomSheet
         ref={updateBottomSheetRef}
         device={selectedDevice}

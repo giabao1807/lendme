@@ -1,31 +1,21 @@
-import React, {
-  useRef,
-  useCallback,
-  useState,
-  useEffect,
-} from 'react';
-import {
-  View,
-  SafeAreaView,
-  Modal,
-  Text,
-  TouchableOpacity,
-} from 'react-native';
-import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import React, {useRef, useCallback, useState, useEffect} from 'react';
+import {View, Modal, Text, TouchableOpacity} from 'react-native';
+import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import {SafeAreaView} from 'react-native-safe-area-context';
 import SearchBar from '../../components/SearchBar';
 import Login from '../../components/Login';
 import AddButton from '../../components/AddButton';
-import DeviceList, { Device } from '../../components/DeviceList/DeviceList';
+import DeviceList, {Device} from '../../components/DeviceList/DeviceList';
 import DeviceBottomSheet from '../../components/DeviceBottomSheet';
 import BorrowBottomSheet from '../../components/BorrowBottomSheet';
 import DetailBottomSheet from '../../components/DetailBottomSheet';
+import UpdateBottomSheet from '../../components/UpdateBottomSheet';
 
-import { db } from '../../config/firebaseConfig';
-import { RootStackParamList } from '../../navigation/types';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {db} from '../../config/firebaseConfig';
+import {RootStackParamList} from '../../navigation/types';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 import styles from './HomeScreen.styles';
 
@@ -37,25 +27,31 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<
 export default function HomeScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
-
   const borrowBottomSheetRef = useRef<BottomSheetModal>(null);
   const deviceBottomSheetRef = useRef<BottomSheetModal>(null);
+  const updateBottomSheetRef = useRef<BottomSheetModal>(null);
 
-  const [activeBottomSheet, setActiveBottomSheet] = useState<'borrow' | 'device' | null>(null);
+  const [activeBottomSheet, setActiveBottomSheet] = useState<
+    'borrow' | 'device' | null
+  >(null);
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
 
   const [availableDevices, setAvailableDevices] = useState<Device[]>([]);
   const [borrowedDevices, setBorrowedDevices] = useState<Device[]>([]);
-  const [filteredAvailableDevices, setFilteredAvailableDevices] = useState<Device[]>([]);
-  const [filteredBorrowedDevices, setFilteredBorrowedDevices] = useState<Device[]>([]);
+  const [filteredAvailableDevices, setFilteredAvailableDevices] = useState<
+    Device[]
+  >([]);
+  const [filteredBorrowedDevices, setFilteredBorrowedDevices] = useState<
+    Device[]
+  >([]);
 
   const [searchText, setSearchText] = useState('');
   const [isEditSheetVisible, setIsEditSheetVisible] = useState(false);
+  const [isUpdateSheetVisible, setIsUpdateSheetVisible] = useState(false);
 
   const [loggedInUser, setLoggedInUser] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [adminModalVisible, setAdminModalVisible] = useState(false);
-
 
   useFocusEffect(
     useCallback(() => {
@@ -66,7 +62,7 @@ export default function HomeScreen() {
         setUserRole(role);
       };
       fetchUserInfo();
-    }, [])
+    }, []),
   );
 
   useEffect(() => {
@@ -86,21 +82,27 @@ export default function HomeScreen() {
     return () => devicesRef.off('value', listener);
   }, []);
 
-
   useEffect(() => {
-    const lowercasedSearchText = searchText.toLowerCase();
+    const trimmedSearchText = searchText.trim().toLowerCase();
+
     setFilteredAvailableDevices(
-      availableDevices.filter(device =>
-        device.deviceName.toLowerCase().includes(lowercasedSearchText)
-      )
+      availableDevices.filter(device => {
+        const combinedString = `${device.brand || ''} ${
+          device.deviceName
+        }`.toLowerCase();
+        return combinedString.includes(trimmedSearchText);
+      }),
     );
+
     setFilteredBorrowedDevices(
-      borrowedDevices.filter(device =>
-        device.deviceName.toLowerCase().includes(lowercasedSearchText)
-      )
+      borrowedDevices.filter(device => {
+        const combinedString = `${device.brand || ''} ${
+          device.deviceName
+        }`.toLowerCase();
+        return combinedString.includes(trimmedSearchText);
+      }),
     );
   }, [searchText, availableDevices, borrowedDevices]);
-
 
   const handleDevicePress = (device: Device) => {
     if (userRole === 'user') {
@@ -124,7 +126,7 @@ export default function HomeScreen() {
   const handleLogout = async () => {
     const username = await AsyncStorage.getItem('loggedInUser');
     if (username) {
-      await db.ref(`/accounts/${username}`).update({ fcmToken: '' });
+      await db.ref(`/accounts/${username}`).update({fcmToken: ''});
     }
 
     await AsyncStorage.clear();
@@ -153,9 +155,8 @@ export default function HomeScreen() {
 
         {activeBottomSheet === null &&
           !isEditSheetVisible &&
-          userRole === 'admin' && (
-            <AddButton onPress={handleAddButtonPress} />
-          )}
+          !isUpdateSheetVisible &&
+          userRole === 'admin' && <AddButton onPress={handleAddButtonPress} />}
 
         {userRole === 'user' && (
           <BorrowBottomSheet
@@ -167,10 +168,22 @@ export default function HomeScreen() {
         )}
 
         {userRole === 'admin' && (
-          <DeviceBottomSheet
-            ref={deviceBottomSheetRef}
-            onClose={() => setActiveBottomSheet(null)}
-          />
+          <>
+            <DeviceBottomSheet
+              ref={deviceBottomSheetRef}
+              onClose={() => setActiveBottomSheet(null)}
+            />
+
+            <UpdateBottomSheet
+              ref={updateBottomSheetRef}
+              device={selectedDevice}
+              onClose={() => {
+
+                setSelectedDevice(null);
+              }}
+              onVisibilityChange={setIsUpdateSheetVisible}
+            />
+          </>
         )}
 
         <DetailBottomSheet
@@ -179,26 +192,27 @@ export default function HomeScreen() {
           onRequestReturn={() => console.log('Request return device')}
           onClose={() => setIsEditSheetVisible(false)}
           onVisibilityChange={setIsEditSheetVisible}
-          onEdit={() => console.log('Edit device')}
+          onEdit={() => {
+            //setIsUpdateSheetVisible(true);
+            updateBottomSheetRef.current?.present();
+            setIsEditSheetVisible(false);
+          }}
         />
 
         <Modal
           transparent
           visible={adminModalVisible}
           animationType="fade"
-          onRequestClose={() => setAdminModalVisible(false)}
-        >
+          onRequestClose={() => setAdminModalVisible(false)}>
           <TouchableOpacity
             style={styles.overlay}
             activeOpacity={1}
-            onPressOut={() => setAdminModalVisible(false)}
-          >
+            onPressOut={() => setAdminModalVisible(false)}>
             <View style={styles.popup}>
               <Text style={styles.username}>Xin chào: {loggedInUser}</Text>
               <TouchableOpacity
                 style={styles.logoutButton}
-                onPress={handleLogout}
-              >
+                onPress={handleLogout}>
                 <Text style={styles.logoutText}>Đăng xuất</Text>
               </TouchableOpacity>
             </View>

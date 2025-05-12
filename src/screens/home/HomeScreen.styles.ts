@@ -4,7 +4,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    paddingTop: 54,
+    paddingTop: 10,
   },
   searchBarContainer: {
     flexDirection: 'row',

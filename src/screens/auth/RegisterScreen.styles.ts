@@ -11,18 +11,19 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 24,
     color: '#fff',
+    marginBottom: 24,
   },
   input: {
     width: '100%',
     height: 50,
-    borderWidth: 1,
-    borderColor: '#ccc',
+    backgroundColor: '#fff',
     borderRadius: 8,
     paddingHorizontal: 16,
     marginBottom: 16,
-    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    color: '#000',
   },
   button: {
     width: '100%',
@@ -39,21 +40,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  linksContainer: {
-    alignItems: 'center',
-    marginTop: 8,
-    marginBottom: 8,
-  },
-  registerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  text: {
-    color: '#fff',
-    fontSize: 14,
-  },
   linkText: {
-    color: '#ffffff',
+    color: '#fff',
     fontSize: 14,
     textDecorationLine: 'underline',
   },

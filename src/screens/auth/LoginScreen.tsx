@@ -72,12 +72,14 @@ export default function LoginScreen({
       <TextInput
         style={styles.input}
         placeholder="Tên đăng nhập"
+        placeholderTextColor={'rgba(0,0,0,0.7)'}
         value={username}
         onChangeText={setUsername}
       />
       <TextInput
         style={styles.input}
         placeholder="Mật khẩu"
+        placeholderTextColor={'rgba(0,0,0,0.7)'}
         secureTextEntry
         value={password}
         onChangeText={setPassword}

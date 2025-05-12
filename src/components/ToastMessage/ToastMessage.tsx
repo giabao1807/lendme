@@ -1,8 +1,8 @@
-// ToastMessage.tsx
 import React from 'react';
 import {View, Text} from 'react-native';
 import Toast, {BaseToastProps} from 'react-native-toast-message';
 import styles from './ToastMessage.styles';
+//import {SafeAreaView} from 'react-native-safe-area-context';
 
 const toastConfig = {
   success: ({text1}: BaseToastProps) => {
@@ -12,16 +12,18 @@ const toastConfig = {
 
     if (!match) {
       return (
-        <View>
-          <Text>{text1}</Text>
-        </View>
+        //<SafeAreaView style={styles.container}>
+          <View>
+            <Text>{text1}</Text>
+          </View>
+        //</SafeAreaView>
       );
     }
 
     const [, deviceName, borrowerName] = match;
 
     return (
-      <View style={styles.container}>
+      <View style={styles.containerToast}>
         <Text style={styles.text}>
           Gửi yêu cầu trả thiết bị <Text style={styles.bold}>{deviceName}</Text>{' '}
           đến <Text style={styles.bold}>{borrowerName}</Text> thành công
@@ -34,4 +36,3 @@ const toastConfig = {
 const ToastMessage = () => <Toast config={toastConfig} />;
 
 export default ToastMessage;
-
